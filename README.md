@@ -1,23 +1,24 @@
-# Ferramenta de Vendas V1.6
+# Mercado de Vendas — V1.6
 
-Backend Node.js para OAuth 2.0 do Mercado Livre + busca MLB + motor de análise.
+Backend Flask com início do fluxo OAuth do Mercado Livre.
 
-## Requisitos
-Node.js 18+.
+## Arquivos
+- app.py — servidor e OAuth
+- requirements.txt — dependências
+- render.yaml — configuração do Render
+- .env.example — variáveis necessárias
 
-## Configuração
-1. Copie `.env.example` para `.env`.
-2. Preencha `ML_CLIENT_ID`, `ML_CLIENT_SECRET` e `ML_REDIRECT_URI`.
-3. No Mercado Livre, cadastre exatamente a mesma Redirect URI. Para criação de aplicação, o Mercado Livre exige HTTPS.
-4. Rode com `npm start`.
+## Redirect URI
+Depois que o serviço estiver publicado no Render, use exatamente:
 
-## Observação importante
-O arquivo HTML sozinho não é suficiente para OAuth seguro. O Secret fica somente no backend. Para usar com uma aplicação do Mercado Livre, publique este backend em um domínio HTTPS e use esse endereço como Redirect URI.
+https://SEU-DOMINIO/oauth/callback
 
-Endpoints:
-- GET /oauth/start
-- GET /oauth/callback
-- GET /api/status
-- GET /api/me
-- GET /api/search?q=...
-- GET /api/analyze?q=...&cost=20&freight=5&commission=15&tax=0&other=0&fixed=0&minMargin=20&maxDays=10
+Essa mesma URI deve estar cadastrada no aplicativo do Mercado Livre.
+
+## Variáveis no Render
+- ML_CLIENT_ID
+- ML_CLIENT_SECRET
+- ML_REDIRECT_URI
+- SESSION_SECRET
+
+Nunca publique o Client Secret no GitHub.
