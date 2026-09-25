@@ -21,8 +21,7 @@ def home():
 @app.get("/health")
 def health():
     return jsonify({"status": "ok", "version": "1.6"})
- 
-    @app.route("/notifications", methods=["POST"])
+ @app.route("/notifications", methods=["POST"])
 def notifications():
     data = request.get_json(silent=True) or {}
 
