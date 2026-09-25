@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: mercado-vendas-v16
+    runtime: python
+    plan: free
+
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+
+      - key: PORT
+        value: 10000
+
+      - key: SESSION_SECRET
+        generateValue: true
+
+      - key: ML_CLIENT_ID
+        sync: false
+
+      - key: ML_CLIENT_SECRET
+        sync: false
+
+      - key: ML_REDIRECT_URI
+        sync: false
+
+      - key: ML_SITE_ID
+        value: MLB
+
+      - key: DB_PATH
+        value: /tmp/mercado_vendas.db
