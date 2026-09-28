@@ -11,11 +11,10 @@ app.secret_key = os.getenv(
     "troque-esta-chave-no-render"
 )
 
-# URLs do Mercado Livre
+# URL de autorização do Mercado Livre
 ML_AUTH_URL = "https://auth.mercadolivre.com.br/authorization"
 
-# Se ML_TOKEN_URI existir no Render, usa ele.
-# Caso contrário, usa automaticamente a URL oficial.
+# URL para obter o token
 ML_TOKEN_URL = os.getenv(
     "ML_TOKEN_URI",
     "https://api.mercadolibre.com/oauth/token"
@@ -80,7 +79,7 @@ def oauth_start():
             "error": "ML_REDIRECT_URI não configurado no Render."
         }), 500
 
-    # Gera estado de segurança para o OAuth
+    # Gera um estado de segurança para o OAuth
     state = os.urandom(16).hex()
     session["oauth_state"] = state
 
@@ -104,7 +103,7 @@ def oauth_start():
 @app.get("/oauth/callback")
 def oauth_callback():
 
-    # Verifica se o Mercado Livre retornou erro
+    # Verifica se o Mercado Livre retornou algum erro
     error = request.args.get("error")
 
     if error:
@@ -116,7 +115,7 @@ def oauth_callback():
             )
         }), 400
 
-    # Verifica o state
+    # Verifica o state de segurança
     received_state = request.args.get("state")
     saved_state = session.get("oauth_state")
 
@@ -135,7 +134,7 @@ def oauth_callback():
             "error": "codigo_oauth_ausente"
         }), 400
 
-    # Variáveis do Render
+    # Variáveis configuradas no Render
     client_id = os.getenv("ML_CLIENT_ID")
     client_secret = os.getenv("ML_CLIENT_SECRET")
     redirect_uri = os.getenv("ML_REDIRECT_URI")
@@ -158,7 +157,7 @@ def oauth_callback():
             "error": "ML_REDIRECT_URI não configurado."
         }), 500
 
-    # Dados para trocar o código pelo access token
+    # Dados usados para trocar o código pelo access token
     payload = {
         "grant_type": "authorization_code",
         "client_id": client_id,
@@ -176,6 +175,7 @@ def oauth_callback():
             data=payload,
             timeout=30
         )
+
     except requests.RequestException as e:
         return jsonify({
             "ok": False,
@@ -188,6 +188,7 @@ def oauth_callback():
 
         try:
             data = response.json()
+
         except ValueError:
             data = {
                 "error": response.text
@@ -200,19 +201,20 @@ def oauth_callback():
             "mercado_livre": data
         }), response.status_code
 
-    # Token recebido
+    # Tenta ler o token recebido
     try:
         token = response.json()
+
     except ValueError:
         return jsonify({
             "ok": False,
             "error": "resposta_invalida_do_mercado_livre"
         }), 502
 
-    # Guarda o token na sessão
+    # Guarda temporariamente o token na sessão
     session["ml_token"] = token
 
-    # Remove o state usado
+    # Remove o state que já foi utilizado
     session.pop("oauth_state", None)
 
     print("Mercado Livre conectado com sucesso.")
